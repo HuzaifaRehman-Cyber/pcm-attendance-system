@@ -121,18 +121,6 @@
         .strength-medium { width: 66%; background: var(--warning-500); }
         .strength-strong { width: 100%; background: var(--success-500); }
         .profile-photo { width: 100px; height: 100px; border-radius: 50%; object-fit: cover; margin: 0 auto 16px; display: block; border: 3px solid var(--primary-500); }
-        
-        /* Permission Matrix Styles */
-        .permission-matrix { display: grid; grid-template-columns: auto repeat(4, 1fr); gap: 8px; margin: 16px 0; }
-        .permission-header { font-weight: 700; text-align: center; padding: 8px; background: var(--gray-100); border-radius: 8px; font-size: 0.7rem; text-transform: uppercase; }
-        .permission-module { font-weight: 600; padding: 8px; background: var(--gray-50); border-radius: 8px; font-size: 0.8rem; }
-        .permission-checkbox { text-align: center; padding: 8px; }
-        .permission-checkbox input { transform: scale(1.2); cursor: pointer; }
-        
-        /* Security Verification Modal */
-        .security-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); backdrop-filter: blur(8px); z-index: 1003; display: flex; align-items: center; justify-content: center; }
-        .security-modal-content { background: white; border-radius: 24px; padding: 32px; max-width: 400px; width: 90%; text-align: center; }
-        
         @media (max-width: 1200px) { .kpi-grid-modern { grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); } .charts-section { grid-template-columns: 1fr; } .executive-summary-grid { grid-template-columns: repeat(2, 1fr); } }
         @media (max-width: 768px) { body { padding: 16px; } .modern-header { padding: 24px; } .header-title h1 { font-size: 1.5rem; } .content-card { padding: 20px; } .tab-modern { padding: 10px 16px; font-size: 0.8rem; } .filter-group { flex-direction: column; } }
     </style>
@@ -180,7 +168,6 @@
         <button class="tab-modern" onclick="switchTab('executive')"><i class="fas fa-chart-simple"></i> Executive Dashboard</button>
         <button class="tab-modern" id="adminTabBtn" onclick="switchTab('admin')" style="display: none;"><i class="fas fa-users-cog"></i> User Admin</button>
         <button class="tab-modern" onclick="switchTab('audit')"><i class="fas fa-history"></i> Audit Trail</button>
-        <button class="tab-modern" id="reportsTabBtn" onclick="switchTab('reports')"><i class="fas fa-file-alt"></i> Reports</button>
     </div>
 
     <!-- Data Hub Tab -->
@@ -411,7 +398,7 @@
             </div>
             <div class="table-wrapper-modern">
                 <table class="table-modern" id="userTable">
-                    <thead><tr><th>Photo</th><th>Username</th><th>Role Label</th><th>Status</th><th>Last Login</th><th>Actions</th></tr></thead>
+                    <thead><tr><th>Photo</th><th>Username</th><th>Role</th><th>Status</th><th>Last Login</th><th>Actions</th></tr></thead>
                     <tbody id="userTableBody"></tbody>
                 </table>
             </div>
@@ -431,33 +418,6 @@
                     <thead><tr><th>Timestamp</th><th>User</th><th>Action</th><th>IP Address</th><th>Device Info</th><th>Details</th></tr></thead>
                     <tbody id="auditTableBody"></tbody>
                 </table>
-            </div>
-        </div>
-    </div>
-
-    <!-- Reports Tab -->
-    <div id="reports" class="tab-content">
-        <div class="content-card">
-            <div class="section-title"><i class="fas fa-file-alt"></i><h2>Reports Center</h2></div>
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px;">
-                <div style="border: 1px solid var(--gray-200); border-radius: 20px; padding: 24px; text-align: center;">
-                    <i class="fas fa-file-pdf" style="font-size: 3rem; color: var(--danger-500); margin-bottom: 16px;"></i>
-                    <h3>Attendance Summary Report</h3>
-                    <p style="margin: 12px 0; color: var(--gray-600);">Generate detailed attendance report with present/absent breakdown</p>
-                    <button class="btn-modern btn-primary-modern" onclick="generateReport('attendance')"><i class="fas fa-download"></i> Generate Report</button>
-                </div>
-                <div style="border: 1px solid var(--gray-200); border-radius: 20px; padding: 24px; text-align: center;">
-                    <i class="fas fa-file-excel" style="font-size: 3rem; color: var(--success-500); margin-bottom: 16px;"></i>
-                    <h3>Payroll Register</h3>
-                    <p style="margin: 12px 0; color: var(--gray-600);">Complete payroll report with all deductions and additions</p>
-                    <button class="btn-modern btn-primary-modern" onclick="generateReport('payroll')"><i class="fas fa-download"></i> Generate Report</button>
-                </div>
-                <div style="border: 1px solid var(--gray-200); border-radius: 20px; padding: 24px; text-align: center;">
-                    <i class="fas fa-chart-bar" style="font-size: 3rem; color: var(--primary-600); margin-bottom: 16px;"></i>
-                    <h3>Exception Analysis</h3>
-                    <p style="margin: 12px 0; color: var(--gray-600);">Detailed analysis of all attendance exceptions</p>
-                    <button class="btn-modern btn-primary-modern" onclick="generateReport('exceptions')"><i class="fas fa-download"></i> Generate Report</button>
-                </div>
             </div>
         </div>
     </div>
@@ -484,7 +444,7 @@
         </div>
         <div style="margin-bottom: 16px; display: flex; justify-content: space-between;">
             <label><input type="checkbox" id="rememberMeCheckbox"> Remember Me</label>
-            <a href="#" onclick="showForgotPasswordMessage(event)" style="color: var(--primary-600);">Forgot Password?</a>
+            <a href="#" onclick="showForgotPassword()" style="color: var(--primary-600);">Forgot Password?</a>
         </div>
         <div id="2faContainer" style="display: none; margin-bottom: 16px;">
             <label>2FA Code</label>
@@ -496,15 +456,11 @@
     </div>
 </div>
 
-<!-- Change Password Modal (with old password verification) -->
+<!-- Change Password Modal -->
 <div id="changePasswordModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 1001; align-items: center; justify-content: center;">
     <div style="background: white; border-radius: 24px; padding: 32px; max-width: 400px; width: 90%;">
         <h3><i class="fas fa-key"></i> Change Password</h3>
-        <p style="margin: 12px 0; color: var(--gray-600);" id="changePasswordMessage"></p>
-        <div style="margin: 16px 0;">
-            <label>Current Password</label>
-            <input type="password" id="oldPasswordInput" placeholder="Enter current password" style="width:100%; padding:12px; border-radius:12px; border:1px solid var(--gray-300); margin-top:6px;">
-        </div>
+        <p style="margin: 12px 0; color: var(--warning-500);">You are required to change your password on first login.</p>
         <div style="margin: 16px 0;">
             <label>New Password</label>
             <input type="password" id="newPassword" placeholder="Enter new password" style="width:100%; padding:12px; border-radius:12px; border:1px solid var(--gray-300); margin-top:6px;" onkeyup="checkPasswordStrength()">
@@ -512,32 +468,10 @@
             <small id="strengthText"></small>
         </div>
         <div style="margin: 16px 0;">
-            <label>Confirm New Password</label>
-            <input type="password" id="confirmPassword" placeholder="Confirm new password" style="width:100%; padding:12px; border-radius:12px; border:1px solid var(--gray-300); margin-top:6px;">
-        </div>
-        <div style="display: flex; gap: 12px; margin-top: 24px;">
-            <button class="btn-modern btn-outline-modern" onclick="closeChangePasswordModal()" style="flex:1;">Cancel</button>
-            <button class="btn-modern btn-primary-modern" onclick="changePasswordWithVerification()" style="flex:1;">Update Password</button>
-        </div>
-    </div>
-</div>
-
-<!-- First Login Password Change Modal (no old password required) -->
-<div id="firstLoginPasswordModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 1001; align-items: center; justify-content: center;">
-    <div style="background: white; border-radius: 24px; padding: 32px; max-width: 400px; width: 90%;">
-        <h3><i class="fas fa-key"></i> Set New Password</h3>
-        <p style="margin: 12px 0; color: var(--warning-500);">You are required to set a new password on first login.</p>
-        <div style="margin: 16px 0;">
-            <label>New Password</label>
-            <input type="password" id="firstNewPassword" placeholder="Enter new password" style="width:100%; padding:12px; border-radius:12px; border:1px solid var(--gray-300); margin-top:6px;" onkeyup="checkFirstPasswordStrength()">
-            <div class="password-strength" id="firstPasswordStrengthBar"></div>
-            <small id="firstStrengthText"></small>
-        </div>
-        <div style="margin: 16px 0;">
             <label>Confirm Password</label>
-            <input type="password" id="firstConfirmPassword" placeholder="Confirm password" style="width:100%; padding:12px; border-radius:12px; border:1px solid var(--gray-300); margin-top:6px;">
+            <input type="password" id="confirmPassword" placeholder="Confirm password" style="width:100%; padding:12px; border-radius:12px; border:1px solid var(--gray-300); margin-top:6px;">
         </div>
-        <button class="btn-modern btn-primary-modern" onclick="setFirstLoginPassword()" style="width:100%;">Set Password</button>
+        <button class="btn-modern btn-primary-modern" onclick="changeFirstLoginPassword()" style="width:100%;">Update Password</button>
     </div>
 </div>
 
@@ -551,67 +485,11 @@
             <button class="btn-modern btn-outline-modern" onclick="document.getElementById('profilePhotoUpload').click()"><i class="fas fa-camera"></i> Change Photo</button>
         </div>
         <div><strong>Username:</strong> <span id="profileUsername"></span></div>
-        <div><strong>Role Label:</strong> <span id="profileRole"></span></div>
+        <div><strong>Role:</strong> <span id="profileRole"></span></div>
         <div><strong>Last Login:</strong> <span id="profileLastLogin"></span></div>
         <div style="margin-top: 20px;">
-            <button class="btn-modern btn-primary-modern" onclick="showChangePasswordModal()">Change Password</button>
+            <button class="btn-modern btn-primary-modern" onclick="showChangePasswordOnly()">Change Password</button>
             <button class="btn-modern btn-outline-modern" onclick="closeProfileModal()">Close</button>
-        </div>
-    </div>
-</div>
-
-<!-- Permission Matrix Modal -->
-<div id="permissionModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 1002; align-items: center; justify-content: center; overflow-y: auto;">
-    <div style="background: white; border-radius: 24px; padding: 32px; max-width: 900px; width: 95%; max-height: 90vh; overflow-y: auto;">
-        <h3><i class="fas fa-lock"></i> Permission Matrix - <span id="permissionUsername"></span></h3>
-        <p style="margin: 12px 0; color: var(--gray-600);">Configure individual module permissions for this user (Role is just a label, permissions are fully independent)</p>
-        
-        <div class="permission-matrix" id="permissionMatrix">
-            <!-- Will be populated dynamically -->
-        </div>
-        
-        <div style="display: flex; gap: 12px; justify-content: flex-end; margin-top: 24px;">
-            <button class="btn-modern btn-outline-modern" onclick="closePermissionModal()">Cancel</button>
-            <button class="btn-modern btn-primary-modern" onclick="savePermissions()"><i class="fas fa-save"></i> Save Permissions</button>
-        </div>
-    </div>
-</div>
-
-<!-- Security Verification Modal -->
-<div id="securityVerificationModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); backdrop-filter: blur(8px); z-index: 1004; align-items: center; justify-content: center;">
-    <div class="security-modal-content">
-        <i class="fas fa-shield-alt" style="font-size: 3rem; color: var(--primary-600); margin-bottom: 16px;"></i>
-        <h3>Security Verification</h3>
-        <p style="margin: 16px 0; color: var(--gray-600);" id="securityActionDescription">First-time action requires password verification</p>
-        <div style="margin: 16px 0;">
-            <label>Enter your password to continue</label>
-            <input type="password" id="securityPasswordInput" placeholder="Enter password" style="width:100%; padding:12px; border-radius:12px; border:1px solid var(--gray-300); margin-top:6px;">
-        </div>
-        <div id="securityErrorMessage" style="color: var(--danger-500); font-size: 0.8rem; margin: 8px 0;"></div>
-        <div style="display: flex; gap: 12px; margin-top: 16px;">
-            <button class="btn-modern btn-outline-modern" onclick="cancelSecurityVerification()" style="flex:1;">Cancel</button>
-            <button class="btn-modern btn-primary-modern" onclick="verifySecurityPassword()" style="flex:1;">Verify</button>
-        </div>
-    </div>
-</div>
-
-<!-- Admin Reset Password Modal -->
-<div id="adminResetPasswordModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 1005; align-items: center; justify-content: center;">
-    <div style="background: white; border-radius: 24px; padding: 32px; max-width: 400px; width: 90%;">
-        <h3><i class="fas fa-key"></i> Reset User Password</h3>
-        <p style="margin: 12px 0; color: var(--gray-600);">Set new password for: <strong id="resetUsernameDisplay"></strong></p>
-        <div style="margin: 16px 0;">
-            <label>New Password</label>
-            <input type="password" id="adminNewPassword" placeholder="Enter new password" style="width:100%; padding:12px; border-radius:12px; border:1px solid var(--gray-300); margin-top:6px;">
-        </div>
-        <div style="margin: 16px 0;">
-            <label>Confirm Password</label>
-            <input type="password" id="adminConfirmPassword" placeholder="Confirm password" style="width:100%; padding:12px; border-radius:12px; border:1px solid var(--gray-300); margin-top:6px;">
-        </div>
-        <div id="adminResetMessage" style="color: var(--danger-500); font-size: 0.8rem; margin: 8px 0;"></div>
-        <div style="display: flex; gap: 12px; margin-top: 24px;">
-            <button class="btn-modern btn-outline-modern" onclick="closeAdminResetModal()" style="flex:1;">Cancel</button>
-            <button class="btn-modern btn-primary-modern" onclick="confirmAdminResetPassword()" style="flex:1;">Reset Password</button>
         </div>
     </div>
 </div>
@@ -628,335 +506,25 @@
     let sessionTimer = null;
     const SESSION_TIMEOUT = 30 * 60 * 1000; // 30 minutes
     
-    // First-time action tracking
-    let userActionHistory = {};
-    let pendingSecurityCallback = null;
-    
-    // Admin reset tracking
-    let pendingResetUserId = null;
-    
-    // Permission System - Default Module List
-    const MODULES = [
-        'regulation', 'attendance_log', 'attendance_exceptions', 
-        'payroll', 'executive_dashboard', 'user_administration', 
-        'audit_trail', 'reports'
-    ];
-    
-    const PERMISSION_LEVELS = ['view', 'add', 'edit', 'delete'];
-    
-    let currentEditingUserId = null;
-    
-    // Load user action history from localStorage
-    function loadUserActionHistory() {
-        let stored = localStorage.getItem('pcm_user_action_history');
-        if(stored) {
-            userActionHistory = JSON.parse(stored);
-        } else {
-            userActionHistory = {};
-        }
-    }
-    
-    function saveUserActionHistory() {
-        localStorage.setItem('pcm_user_action_history', JSON.stringify(userActionHistory));
-    }
-    
-    // Check if this is first time user is performing this action on this module
-    function isFirstTimeAction(module, action) {
-        if (!currentUser) return false;
-        const userId = currentUser.id;
-        if (!userActionHistory[userId]) {
-            userActionHistory[userId] = {};
-        }
-        if (!userActionHistory[userId][module]) {
-            userActionHistory[userId][module] = {};
-        }
-        return !userActionHistory[userId][module][action];
-    }
-    
-    // Mark action as performed (after successful verification)
-    function markActionPerformed(module, action) {
-        if (!currentUser) return;
-        const userId = currentUser.id;
-        if (!userActionHistory[userId]) {
-            userActionHistory[userId] = {};
-        }
-        if (!userActionHistory[userId][module]) {
-            userActionHistory[userId][module] = {};
-        }
-        userActionHistory[userId][module][action] = true;
-        saveUserActionHistory();
-    }
-    
-    // Check if user has permission for an action on a module
-    function hasPermission(module, action) {
-        if (!currentUser) return false;
-        
-        // Check user's permission matrix
-        if (!currentUser.permissions) return false;
-        if (!currentUser.permissions[module]) return false;
-        
-        return currentUser.permissions[module][action] === true;
-    }
-    
-    // Require security verification for first-time actions
-    function requireSecurityVerification(module, action, description, callback) {
-        if (!currentUser) {
-            alert('Not logged in');
-            return false;
-        }
-        
-        // Check permission first
-        if (!hasPermission(module, action)) {
-            alert('Access denied. You do not have permission to perform this action.');
-            return false;
-        }
-        
-        // Check if this is first time
-        if (isFirstTimeAction(module, action)) {
-            // Show security verification modal
-            pendingSecurityCallback = { module, action, callback };
-            document.getElementById('securityActionDescription').innerHTML = 
-                `<strong>First-time action:</strong> ${description}<br><small>Module: ${module} | Action: ${action}</small>`;
-            document.getElementById('securityPasswordInput').value = '';
-            document.getElementById('securityErrorMessage').innerHTML = '';
-            document.getElementById('securityVerificationModal').style.display = 'flex';
-            return false;
-        }
-        
-        return true;
-    }
-    
-    function verifySecurityPassword() {
-        const password = document.getElementById('securityPasswordInput').value;
-        
-        if (!currentUser) {
-            cancelSecurityVerification();
-            return;
-        }
-        
-        // Find user in users array to verify password
-        const user = users.find(u => u.id === currentUser.id);
-        if (!user) {
-            document.getElementById('securityErrorMessage').innerHTML = 'User not found';
-            return;
-        }
-        
-        if (btoa(password) !== user.passwordHash) {
-            document.getElementById('securityErrorMessage').innerHTML = 'Invalid password';
-            return;
-        }
-        
-        // Password verified
-        const { module, action, callback } = pendingSecurityCallback;
-        
-        // Mark action as performed
-        markActionPerformed(module, action);
-        
-        // Log the verification
-        addAuditLog(currentUser.username, 'Security Verification', `First-time ${action} on ${module} verified`);
-        
-        // Close modal
-        document.getElementById('securityVerificationModal').style.display = 'none';
-        
-        // Execute the callback
-        if (callback) {
-            callback();
-        }
-        
-        pendingSecurityCallback = null;
-    }
-    
-    function cancelSecurityVerification() {
-        document.getElementById('securityVerificationModal').style.display = 'none';
-        pendingSecurityCallback = null;
-        addAuditLog(currentUser?.username || 'Unknown', 'Security Cancel', 'Security verification cancelled');
-    }
-    
-    // Apply UI permissions based on current user
-    function applyUIPermissions() {
-        if (!currentUser) return;
-        
-        // Hide/show tabs based on view permissions
-        const tabMappings = {
-            'settings': 'regulation',
-            'attendance': 'attendance_log',
-            'exceptions': 'attendance_exceptions',
-            'salary': 'payroll',
-            'executive': 'executive_dashboard',
-            'admin': 'user_administration',
-            'audit': 'audit_trail',
-            'reports': 'reports'
-        };
-        
-        // Update tab visibility
-        document.querySelectorAll('.tab-modern').forEach(tab => {
-            const onclick = tab.getAttribute('onclick');
-            if (onclick) {
-                const match = onclick.match(/switchTab\('(\w+)'\)/);
-                if (match) {
-                    const tabId = match[1];
-                    const module = tabMappings[tabId];
-                    if (module) {
-                        if (!hasPermission(module, 'view')) {
-                            tab.style.display = 'none';
-                        } else {
-                            tab.style.display = 'flex';
-                        }
-                    }
-                }
-            }
-        });
-        
-        // Apply action button permissions
-        applyActionButtonPermissions();
-    }
-    
-    function applyActionButtonPermissions() {
-        // Data Hub - Process button requires add permission on attendance_log
-        const processBtn = document.getElementById('processDataBtn');
-        if (processBtn) {
-            if (!hasPermission('attendance_log', 'add')) {
-                processBtn.disabled = true;
-                processBtn.title = 'You do not have permission to process data';
-            }
-        }
-        
-        // Regulations - Apply/Save buttons require edit permission
-        const regulationButtons = document.querySelectorAll('#settings .btn-primary-modern, #settings .btn-success-modern');
-        regulationButtons.forEach(btn => {
-            if (!hasPermission('regulation', 'edit')) {
-                btn.disabled = true;
-                btn.title = 'You do not have permission to edit regulations';
-            }
-        });
-        
-        // Exceptions - Save buttons require edit permission
-        const exceptionButtons = document.querySelectorAll('#exceptions .btn-primary-modern, #exceptions .btn-success-modern');
-        exceptionButtons.forEach(btn => {
-            if (!hasPermission('attendance_exceptions', 'edit')) {
-                btn.disabled = true;
-                btn.title = 'You do not have permission to edit exceptions';
-            }
-        });
-        
-        // Admin - Add User button requires add permission
-        const adminAddBtn = document.querySelector('#admin .btn-primary-modern');
-        if (adminAddBtn && adminAddBtn.textContent.includes('Add New User')) {
-            if (!hasPermission('user_administration', 'add')) {
-                adminAddBtn.disabled = true;
-                adminAddBtn.title = 'You do not have permission to add users';
-            }
-        }
-    }
-    
-    // Permission Matrix Modal Functions
-    function showPermissionModal(userId) {
-        const user = users.find(u => u.id === userId);
-        if (!user) return;
-        
-        currentEditingUserId = userId;
-        document.getElementById('permissionUsername').textContent = user.username;
-        
-        // Build permission matrix UI
-        const matrixDiv = document.getElementById('permissionMatrix');
-        let html = `
-            <div class="permission-header">Module</div>
-            <div class="permission-header">View</div>
-            <div class="permission-header">Add</div>
-            <div class="permission-header">Edit</div>
-            <div class="permission-header">Delete</div>
-        `;
-        
-        const moduleNames = {
-            'regulation': 'Regulation',
-            'attendance_log': 'Attendance Log',
-            'attendance_exceptions': 'Attendance Exceptions',
-            'payroll': 'Payroll',
-            'executive_dashboard': 'Executive Dashboard',
-            'user_administration': 'User Administration',
-            'audit_trail': 'Audit Trail',
-            'reports': 'Reports'
-        };
-        
-        MODULES.forEach(module => {
-            const permissions = user.permissions?.[module] || { view: false, add: false, edit: false, delete: false };
-            
-            html += `<div class="permission-module">${moduleNames[module]}</div>`;
-            
-            PERMISSION_LEVELS.forEach(level => {
-                const checked = permissions[level] ? 'checked' : '';
-                html += `
-                    <div class="permission-checkbox">
-                        <input type="checkbox" id="perm_${module}_${level}" ${checked}>
-                    </div>
-                `;
-            });
-        });
-        
-        matrixDiv.innerHTML = html;
-        document.getElementById('permissionModal').style.display = 'flex';
-    }
-    
-    function closePermissionModal() {
-        document.getElementById('permissionModal').style.display = 'none';
-        currentEditingUserId = null;
-    }
-    
-    function savePermissions() {
-        if (!currentEditingUserId) return;
-        
-        const userIndex = users.findIndex(u => u.id === currentEditingUserId);
-        if (userIndex === -1) return;
-        
-        // Build permissions object
-        const permissions = {};
-        MODULES.forEach(module => {
-            permissions[module] = {};
-            PERMISSION_LEVELS.forEach(level => {
-                const checkbox = document.getElementById(`perm_${module}_${level}`);
-                permissions[module][level] = checkbox ? checkbox.checked : false;
-            });
-        });
-        
-        users[userIndex].permissions = permissions;
-        saveUsers();
-        
-        addAuditLog(currentUser.username, 'Permission Update', `Updated permissions for user: ${users[userIndex].username}`);
-        
-        closePermissionModal();
-        loadUsers();
-        showMessage('Permissions saved successfully', 'success');
-    }
-    
     // Load initial data from localStorage
     function loadUserData() {
         let storedUsers = localStorage.getItem('pcm_users');
         if(storedUsers) {
             users = JSON.parse(storedUsers);
         } else {
-            // Default admin user with full permissions
+            // Default admin user
             users = [{
                 id: 'user_1',
                 username: 'admin',
-                passwordHash: btoa('Admin@123'),
-                roleLabel: 'Administrator',
+                passwordHash: btoa('Admin@123'), // Simple encoding (in production use proper hashing)
+                role: 'Admin',
                 status: 'Active',
                 profilePhoto: '',
                 forcePasswordChange: false,
                 lastLogin: null,
                 loginHistory: [],
                 createdAt: new Date().toISOString(),
-                isDeleted: false,
-                permissions: {
-                    regulation: { view: true, add: true, edit: true, delete: true },
-                    attendance_log: { view: true, add: true, edit: true, delete: true },
-                    attendance_exceptions: { view: true, add: true, edit: true, delete: true },
-                    payroll: { view: true, add: true, edit: true, delete: true },
-                    executive_dashboard: { view: true, add: true, edit: true, delete: true },
-                    user_administration: { view: true, add: true, edit: true, delete: true },
-                    audit_trail: { view: true, add: true, edit: true, delete: true },
-                    reports: { view: true, add: true, edit: true, delete: true }
-                }
+                isDeleted: false
             }];
             saveUsers();
         }
@@ -970,8 +538,6 @@
         if(storedApprovals) {
             pendingRoleApprovals = JSON.parse(storedApprovals);
         }
-        
-        loadUserActionHistory();
     }
     
     function saveUsers() { localStorage.setItem('pcm_users', JSON.stringify(users)); }
@@ -993,13 +559,14 @@
         saveAudit();
     }
     
-    function getClientIP() { return '127.0.0.1'; }
+    function getClientIP() { return '127.0.0.1'; } // In production, get from server
     
     function attemptLogin() {
         let username = document.getElementById('loginUsername').value.trim();
         let password = document.getElementById('loginPassword').value;
         let rememberMe = document.getElementById('rememberMeCheckbox').checked;
         
+        // Check account lockout
         if(failedLoginAttempts[username] && failedLoginAttempts[username].count >= 5) {
             let lockTime = failedLoginAttempts[username].lockTime;
             if(Date.now() - lockTime < 15 * 60 * 1000) {
@@ -1028,8 +595,10 @@
             return;
         }
         
+        // Successful login
         delete failedLoginAttempts[username];
         
+        // Check if 2FA is enabled (simulated)
         if(user.twoFactorEnabled) {
             pending2FAUser = user;
             show2FAInput();
@@ -1057,15 +626,13 @@
     function completeLogin(user, rememberMe) {
         currentUser = { ...user, passwordHash: undefined };
         
+        // Update last login
         let loginInfo = { time: new Date().toISOString(), ip: getClientIP(), device: navigator.userAgent };
-        let userIndex = users.findIndex(u => u.id === user.id);
-        if (userIndex !== -1) {
-            users[userIndex].lastLogin = loginInfo.time;
-            if(!users[userIndex].loginHistory) users[userIndex].loginHistory = [];
-            users[userIndex].loginHistory.unshift(loginInfo);
-            if(users[userIndex].loginHistory.length > 50) users[userIndex].loginHistory.pop();
-            saveUsers();
-        }
+        user.lastLogin = loginInfo.time;
+        if(!user.loginHistory) user.loginHistory = [];
+        user.loginHistory.unshift(loginInfo);
+        if(user.loginHistory.length > 50) user.loginHistory.pop();
+        saveUsers();
         
         addAuditLog(user.username, 'Login', 'Successful login');
         
@@ -1075,23 +642,23 @@
             localStorage.setItem('pcm_remember_user', user.id);
         }
         
+        // Check force password change
         if(user.forcePasswordChange) {
-            showFirstLoginPasswordModal();
+            showChangePasswordModal();
             return;
         }
         
         document.getElementById('loginOverlay').style.display = 'none';
         document.getElementById('mainApp').style.display = 'block';
-        document.getElementById('currentUserDisplay').innerHTML = `<i class="fas fa-user"></i> ${user.username} (${user.roleLabel || 'User'})`;
+        document.getElementById('currentUserDisplay').innerHTML = `<i class="fas fa-user"></i> ${user.username} (${user.role})`;
         
-        if(hasPermission('user_administration', 'view')) {
+        if(user.role === 'Admin') {
             document.getElementById('adminTabBtn').style.display = 'flex';
         }
         
-        applyUIPermissions();
-        
         startSessionTimer();
         
+        // Load all original data
         loadWorkingDays();
         if(typeof loadAllData === 'function') loadAllData();
     }
@@ -1137,9 +704,8 @@
                 currentUser = { ...user, passwordHash: undefined };
                 document.getElementById('loginOverlay').style.display = 'none';
                 document.getElementById('mainApp').style.display = 'block';
-                document.getElementById('currentUserDisplay').innerHTML = `<i class="fas fa-user"></i> ${user.username} (${user.roleLabel || 'User'})`;
-                if(hasPermission('user_administration', 'view')) document.getElementById('adminTabBtn').style.display = 'flex';
-                applyUIPermissions();
+                document.getElementById('currentUserDisplay').innerHTML = `<i class="fas fa-user"></i> ${user.username} (${user.role})`;
+                if(user.role === 'Admin') document.getElementById('adminTabBtn').style.display = 'flex';
                 startSessionTimer();
                 if(typeof loadAllData === 'function') loadAllData();
             }
@@ -1152,75 +718,13 @@
         setTimeout(() => div.innerHTML = '', 3000);
     }
     
-    // Password Management Functions
-    function showFirstLoginPasswordModal() {
-        document.getElementById('firstLoginPasswordModal').style.display = 'flex';
-    }
-    
-    function closeFirstLoginPasswordModal() {
-        document.getElementById('firstLoginPasswordModal').style.display = 'none';
-    }
-    
-    function checkFirstPasswordStrength() {
-        let pwd = document.getElementById('firstNewPassword').value;
-        let bar = document.getElementById('firstPasswordStrengthBar');
-        let text = document.getElementById('firstStrengthText');
-        if(pwd.length < 6) {
-            bar.className = 'password-strength strength-weak';
-            text.innerHTML = 'Weak password';
-        } else if(pwd.match(/[A-Z]/) && pwd.match(/[0-9]/) && pwd.length >= 8) {
-            bar.className = 'password-strength strength-strong';
-            text.innerHTML = 'Strong password';
-        } else {
-            bar.className = 'password-strength strength-medium';
-            text.innerHTML = 'Medium password';
-        }
-    }
-    
-    function setFirstLoginPassword() {
-        let newPwd = document.getElementById('firstNewPassword').value;
-        let confirmPwd = document.getElementById('firstConfirmPassword').value;
-        
-        if(newPwd !== confirmPwd) {
-            alert('Passwords do not match');
-            return;
-        }
-        if(newPwd.length < 6) {
-            alert('Password must be at least 6 characters');
-            return;
-        }
-        
-        let userIndex = users.findIndex(u => u.id === currentUser.id);
-        if(userIndex !== -1) {
-            users[userIndex].passwordHash = btoa(newPwd);
-            users[userIndex].forcePasswordChange = false;
-            saveUsers();
-            currentUser.forcePasswordChange = false;
-            addAuditLog(currentUser.username, 'Password Change', 'First login password set');
-        }
-        
-        closeFirstLoginPasswordModal();
-        document.getElementById('loginOverlay').style.display = 'none';
-        document.getElementById('mainApp').style.display = 'block';
-        document.getElementById('currentUserDisplay').innerHTML = `<i class="fas fa-user"></i> ${currentUser.username} (${currentUser.roleLabel || 'User'})`;
-        applyUIPermissions();
-        startSessionTimer();
-        loadWorkingDays();
-        alert('Password set successfully');
-    }
-    
     function showChangePasswordModal() {
-        document.getElementById('oldPasswordInput').value = '';
-        document.getElementById('newPassword').value = '';
-        document.getElementById('confirmPassword').value = '';
-        document.getElementById('changePasswordMessage').innerHTML = '';
-        document.getElementById('passwordStrengthBar').className = 'password-strength';
-        document.getElementById('strengthText').innerHTML = '';
         document.getElementById('changePasswordModal').style.display = 'flex';
     }
     
-    function closeChangePasswordModal() {
-        document.getElementById('changePasswordModal').style.display = 'none';
+    function showChangePasswordOnly() {
+        closeProfileModal();
+        showChangePasswordModal();
     }
     
     function checkPasswordStrength() {
@@ -1239,114 +743,35 @@
         }
     }
     
-    function changePasswordWithVerification() {
-        let oldPwd = document.getElementById('oldPasswordInput').value;
+    function changeFirstLoginPassword() {
         let newPwd = document.getElementById('newPassword').value;
         let confirmPwd = document.getElementById('confirmPassword').value;
-        let msgDiv = document.getElementById('changePasswordMessage');
         
-        if(!oldPwd) {
-            msgDiv.innerHTML = 'Please enter your current password';
+        if(newPwd !== confirmPwd) {
+            alert('Passwords do not match');
+            return;
+        }
+        if(newPwd.length < 6) {
+            alert('Password must be at least 6 characters');
             return;
         }
         
-        // Verify old password
         let userIndex = users.findIndex(u => u.id === currentUser.id);
-        if(userIndex === -1) {
-            msgDiv.innerHTML = 'User not found';
-            return;
+        if(userIndex !== -1) {
+            users[userIndex].passwordHash = btoa(newPwd);
+            users[userIndex].forcePasswordChange = false;
+            saveUsers();
+            currentUser.forcePasswordChange = false;
+            addAuditLog(currentUser.username, 'Password Change', 'First login password changed');
         }
         
-        if(btoa(oldPwd) !== users[userIndex].passwordHash) {
-            msgDiv.innerHTML = 'Current password is incorrect';
-            return;
-        }
-        
-        if(newPwd !== confirmPwd) {
-            msgDiv.innerHTML = 'New passwords do not match';
-            return;
-        }
-        
-        if(newPwd.length < 6) {
-            msgDiv.innerHTML = 'Password must be at least 6 characters';
-            return;
-        }
-        
-        // Update password
-        users[userIndex].passwordHash = btoa(newPwd);
-        saveUsers();
-        
-        addAuditLog(currentUser.username, 'Password Change', 'User changed their password');
-        
-        closeChangePasswordModal();
+        document.getElementById('changePasswordModal').style.display = 'none';
         alert('Password changed successfully');
-    }
-    
-    // Forgot Password - Shows admin contact message only
-    function showForgotPasswordMessage(event) {
-        if(event) event.preventDefault();
-        alert('Please contact Administrator to reset your password.\n\nNo automatic password reset is available for security reasons.');
-        addAuditLog('Unknown', 'Forgot Password Attempt', 'User attempted to use forgot password');
-    }
-    
-    // Admin Reset Password Functions
-    function showAdminResetPasswordModal(userId) {
-        const user = users.find(u => u.id === userId);
-        if(!user) return;
-        
-        pendingResetUserId = userId;
-        document.getElementById('resetUsernameDisplay').textContent = user.username;
-        document.getElementById('adminNewPassword').value = '';
-        document.getElementById('adminConfirmPassword').value = '';
-        document.getElementById('adminResetMessage').innerHTML = '';
-        document.getElementById('adminResetPasswordModal').style.display = 'flex';
-    }
-    
-    function closeAdminResetModal() {
-        document.getElementById('adminResetPasswordModal').style.display = 'none';
-        pendingResetUserId = null;
-    }
-    
-    function confirmAdminResetPassword() {
-        if(!pendingResetUserId) return;
-        
-        let newPwd = document.getElementById('adminNewPassword').value;
-        let confirmPwd = document.getElementById('adminConfirmPassword').value;
-        let msgDiv = document.getElementById('adminResetMessage');
-        
-        if(newPwd !== confirmPwd) {
-            msgDiv.innerHTML = 'Passwords do not match';
-            return;
-        }
-        
-        if(newPwd.length < 6) {
-            msgDiv.innerHTML = 'Password must be at least 6 characters';
-            return;
-        }
-        
-        let userIndex = users.findIndex(u => u.id === pendingResetUserId);
-        if(userIndex === -1) {
-            msgDiv.innerHTML = 'User not found';
-            return;
-        }
-        
-        users[userIndex].passwordHash = btoa(newPwd);
-        users[userIndex].forcePasswordChange = true;
-        saveUsers();
-        
-        addAuditLog(currentUser.username, 'Admin Password Reset', `Reset password for user: ${users[userIndex].username}`);
-        
-        closeAdminResetModal();
-        loadUsers();
-        alert(`Password for ${users[userIndex].username} has been reset. User will be prompted to change password on next login.`);
     }
     
     // User Management Functions
     function loadUsers() {
-        if(!currentUser || !hasPermission('user_administration', 'view')) {
-            alert('Access denied. You do not have permission to view user administration.');
-            return;
-        }
+        if(!currentUser || currentUser.role !== 'Admin') return;
         let tbody = document.getElementById('userTableBody');
         if(!tbody) return;
         tbody.innerHTML = '';
@@ -1355,44 +780,21 @@
             let row = tbody.insertRow();
             row.insertCell(0).innerHTML = user.profilePhoto ? `<img src="${user.profilePhoto}" style="width: 35px; height: 35px; border-radius: 50%; object-fit: cover;">` : '<i class="fas fa-user-circle" style="font-size: 35px;"></i>';
             row.insertCell(1).innerText = user.username;
-            row.insertCell(2).innerHTML = `<span class="status-badge status-ambiguous">${user.roleLabel || 'User'}</span>`;
+            row.insertCell(2).innerHTML = `<span class="status-badge ${user.role === 'Admin' ? 'status-present' : 'status-ambiguous'}">${user.role}</span>`;
             row.insertCell(3).innerHTML = `<span class="status-badge ${user.status === 'Active' ? 'status-present' : 'status-absent'}">${user.status}</span>`;
             row.insertCell(4).innerText = user.lastLogin ? new Date(user.lastLogin).toLocaleString() : 'Never';
-            
-            let actionsHtml = '';
-            if (hasPermission('user_administration', 'edit')) {
-                actionsHtml += `<button class="action-btn btn-primary" onclick="editUser('${user.id}')"><i class="fas fa-edit"></i></button>`;
-                actionsHtml += `<button class="action-btn btn-primary" onclick="showPermissionModal('${user.id}')" title="Permissions"><i class="fas fa-lock"></i></button>`;
-            }
-            if (hasPermission('user_administration', 'edit')) {
-                actionsHtml += `<button class="action-btn ${user.status === 'Active' ? 'btn-danger' : 'btn-success'}" onclick="toggleUserStatus('${user.id}')"><i class="fas ${user.status === 'Active' ? 'fa-ban' : 'fa-check'}"></i></button>`;
-                actionsHtml += `<button class="action-btn btn-primary" onclick="showAdminResetPasswordModal('${user.id}')"><i class="fas fa-key"></i></button>`;
-            }
-            if (hasPermission('user_administration', 'delete')) {
-                actionsHtml += `<button class="action-btn btn-danger" onclick="deleteUser('${user.id}')"><i class="fas fa-trash"></i></button>`;
-            }
-            row.insertCell(5).innerHTML = actionsHtml;
+            row.insertCell(5).innerHTML = `
+                <button class="action-btn btn-primary" onclick="editUser('${user.id}')"><i class="fas fa-edit"></i></button>
+                <button class="action-btn ${user.status === 'Active' ? 'btn-danger' : 'btn-success'}" onclick="toggleUserStatus('${user.id}')"><i class="fas ${user.status === 'Active' ? 'fa-ban' : 'fa-check'}"></i></button>
+                <button class="action-btn btn-primary" onclick="resetUserPassword('${user.id}')"><i class="fas fa-key"></i></button>
+                <button class="action-btn btn-danger" onclick="deleteUser('${user.id}')"><i class="fas fa-trash"></i></button>
+            `;
         });
     }
     
     function showAddUserModal() {
-        if (!hasPermission('user_administration', 'add')) {
-            alert('Access denied. You do not have permission to add users.');
-            return;
-        }
-        
-        if (!requireSecurityVerification('user_administration', 'add', 'Add New User', () => {
-            showAddUserModalInternal();
-        })) {
-            return;
-        }
-        
-        showAddUserModalInternal();
-    }
-    
-    function showAddUserModalInternal() {
-        let roleLabel = prompt('Enter role label (e.g., Admin, Manager, Staff):', 'Staff');
-        if(!roleLabel) return;
+        let role = prompt('Enter role (Admin/Manager/Employee):', 'Employee');
+        if(!role) return;
         let username = prompt('Enter username:');
         if(!username) return;
         let password = prompt('Enter password:');
@@ -1403,56 +805,58 @@
             return;
         }
         
-        // Default permissions - all false
-        const permissions = {};
-        MODULES.forEach(module => {
-            permissions[module] = { view: false, add: false, edit: false, delete: false };
-        });
-        
         let newUser = {
             id: 'user_' + Date.now(),
             username: username,
             passwordHash: btoa(password),
-            roleLabel: roleLabel,
+            role: role,
             status: 'Active',
             profilePhoto: '',
             forcePasswordChange: true,
             lastLogin: null,
             loginHistory: [],
             createdAt: new Date().toISOString(),
-            isDeleted: false,
-            permissions: permissions
+            isDeleted: false
         };
         users.push(newUser);
         saveUsers();
-        addAuditLog(currentUser.username, 'User Created', `Created user: ${username} with label: ${roleLabel}`);
+        addAuditLog(currentUser.username, 'User Created', `Created user: ${username} with role: ${role}`);
         loadUsers();
-        alert('User created successfully. Please configure permissions.');
+        alert('User created successfully');
     }
     
     function editUser(userId) {
-        if (!hasPermission('user_administration', 'edit')) {
-            alert('Access denied. You do not have permission to edit users.');
-            return;
-        }
-        
         let user = users.find(u => u.id === userId);
         if(!user) return;
-        let newLabel = prompt('Enter new role label:', user.roleLabel || 'User');
-        if(newLabel) {
-            user.roleLabel = newLabel;
+        let newRole = prompt('Enter new role (Admin/Manager/Employee):', user.role);
+        if(newRole && newRole !== user.role) {
+            if(newRole === 'Admin' && currentUser.role !== 'Admin') {
+                alert('Only Admin can assign Admin role');
+                return;
+            }
+            // Role change approval workflow
+            if(currentUser.role !== 'Admin' && newRole !== user.role) {
+                pendingRoleApprovals.push({
+                    id: Date.now(),
+                    userId: user.id,
+                    username: user.username,
+                    requestedRole: newRole,
+                    requestedBy: currentUser.username,
+                    status: 'Pending'
+                });
+                saveApprovals();
+                alert('Role change request submitted for admin approval');
+                addAuditLog(currentUser.username, 'Role Request', `Requested role change for ${user.username} to ${newRole}`);
+                return;
+            }
+            user.role = newRole;
             saveUsers();
-            addAuditLog(currentUser.username, 'User Edit', `Changed ${user.username} label to ${newLabel}`);
+            addAuditLog(currentUser.username, 'Role Changed', `Changed ${user.username} role to ${newRole}`);
         }
         loadUsers();
     }
     
     function toggleUserStatus(userId) {
-        if (!hasPermission('user_administration', 'edit')) {
-            alert('Access denied. You do not have permission to modify users.');
-            return;
-        }
-        
         let user = users.find(u => u.id === userId);
         if(user && user.username !== 'admin') {
             user.status = user.status === 'Active' ? 'Inactive' : 'Active';
@@ -1460,16 +864,27 @@
             addAuditLog(currentUser.username, 'User Status', `${user.status === 'Active' ? 'Activated' : 'Deactivated'} user: ${user.username}`);
             loadUsers();
         } else if(user && user.username === 'admin') {
-            alert('Cannot deactivate primary admin account');
+            alert('Cannot deactivate admin account');
+        }
+    }
+    
+    function resetUserPassword(userId) {
+        let user = users.find(u => u.id === userId);
+        if(user) {
+            let newPwd = prompt('Enter new password for ' + user.username);
+            if(newPwd && newPwd.length >= 6) {
+                user.passwordHash = btoa(newPwd);
+                user.forcePasswordChange = true;
+                saveUsers();
+                addAuditLog(currentUser.username, 'Password Reset', `Reset password for ${user.username}`);
+                alert('Password reset successfully');
+            } else if(newPwd) {
+                alert('Password must be at least 6 characters');
+            }
         }
     }
     
     function deleteUser(userId) {
-        if (!hasPermission('user_administration', 'delete')) {
-            alert('Access denied. You do not have permission to delete users.');
-            return;
-        }
-        
         let user = users.find(u => u.id === userId);
         if(user && user.username !== 'admin') {
             if(confirm(`Are you sure you want to delete user ${user.username}?`)) {
@@ -1477,10 +892,10 @@
                 saveUsers();
                 addAuditLog(currentUser.username, 'User Deleted', `Deleted user: ${user.username}`);
                 loadUsers();
-                alert('User deleted');
+                alert('User deleted (can be restored by admin)');
             }
         } else if(user && user.username === 'admin') {
-            alert('Cannot delete primary admin account');
+            alert('Cannot delete admin account');
         }
     }
     
@@ -1504,7 +919,7 @@
     
     function showProfile() {
         document.getElementById('profileUsername').innerText = currentUser.username;
-        document.getElementById('profileRole').innerText = currentUser.roleLabel || 'User';
+        document.getElementById('profileRole').innerText = currentUser.role;
         document.getElementById('profileLastLogin').innerText = currentUser.lastLogin ? new Date(currentUser.lastLogin).toLocaleString() : 'Never';
         document.getElementById('profilePhotoImg').src = currentUser.profilePhoto || 'https://via.placeholder.com/100';
         document.getElementById('profileModal').style.display = 'flex';
@@ -1514,12 +929,11 @@
         document.getElementById('profileModal').style.display = 'none';
     }
     
+    function showForgotPassword() {
+        alert('Please contact system administrator to reset your password.');
+    }
+    
     function filterAudit() {
-        if (!hasPermission('audit_trail', 'view')) {
-            alert('Access denied. You do not have permission to view audit trail.');
-            return;
-        }
-        
         let search = document.getElementById('auditSearch').value.toLowerCase();
         let tbody = document.getElementById('auditTableBody');
         if(!tbody) return;
@@ -1537,11 +951,6 @@
     }
     
     function exportAudit() {
-        if (!hasPermission('audit_trail', 'view')) {
-            alert('Access denied.');
-            return;
-        }
-        
         let csv = 'Timestamp,User,Action,IP,Device,Details\n';
         auditLogs.forEach(log => {
             csv += `"${log.timestamp}","${log.user}","${log.action}","${log.ip}","${log.device}","${log.details || ''}"\n`;
@@ -1553,144 +962,37 @@
         a.click();
     }
     
-    // Reports Functions
-    function generateReport(type) {
-        if (!hasPermission('reports', 'view')) {
-            alert('Access denied. You do not have permission to generate reports.');
-            return;
-        }
-        
-        if (!requireSecurityVerification('reports', 'view', `Generate ${type} report`, () => {
-            generateReportInternal(type);
-        })) {
-            return;
-        }
-        
-        generateReportInternal(type);
-    }
-    
-    function generateReportInternal(type) {
-        let content = '';
-        let filename = '';
-        
-        if (type === 'attendance') {
-            content = generateAttendanceReport();
-            filename = `attendance_report_${new Date().toISOString().slice(0,10)}.csv`;
-        } else if (type === 'payroll') {
-            content = generatePayrollReport();
-            filename = `payroll_report_${new Date().toISOString().slice(0,10)}.csv`;
-        } else if (type === 'exceptions') {
-            content = generateExceptionReport();
-            filename = `exception_report_${new Date().toISOString().slice(0,10)}.csv`;
-        }
-        
-        if (content) {
-            let blob = new Blob([content], {type: 'text/csv'});
-            let a = document.createElement('a');
-            a.href = URL.createObjectURL(blob);
-            a.download = filename;
-            a.click();
-            
-            addAuditLog(currentUser.username, 'Report Generated', `Generated ${type} report`);
-            showMessage(`${type} report generated successfully`, 'success');
-        }
-    }
-    
-    function generateAttendanceReport() {
-        let csv = 'Employee,Date,Day Type,Status,In Time,Out Time,Worked Minutes,Required Minutes,Late Minutes,Early Minutes,Overtime Minutes\n';
-        
-        Object.keys(processedData).forEach(emp => {
-            Object.keys(processedData[emp]).forEach(date => {
-                let r = processedData[emp][date];
-                if (r.status === 'Sunday') return;
-                csv += `"${emp}","${date}","${r.dayType}","${r.status}","${r.inTime}","${r.outTime}",${r.worked},${r.required},${r.late},${r.early},${r.overtime}\n`;
-            });
-        });
-        
-        return csv;
-    }
-    
-    function generatePayrollReport() {
-        let csv = 'Employee,Gross Salary,Present Days,Absent Days,Required Minutes,Worked Minutes,Late Deduction,Early Deduction,Absent Deduction,OT Paid,Encashment,Net Payable\n';
-        
-        Object.keys(salaryData).forEach(emp => {
-            let details = calculateEmployeeSalaryDetails(emp);
-            csv += `"${emp}",${details.gross},${details.presentDays},${details.absentDays},${details.totalReq},${details.totalWorked},${details.lateDeduct},${details.earlyDeduct},${details.absentDeduct},${details.otPaid},${details.encashment},${details.netPayable}\n`;
-        });
-        
-        return csv;
-    }
-    
-    function generateExceptionReport() {
-        let csv = 'Exception Type,Employee,Date,Day Type,Minutes/Amount\n';
-        
-        exceptions.absent.forEach(a => {
-            csv += `"Absent","${a.emp}","${a.date}","${a.dayType}","-"\n`;
-        });
-        
-        exceptions.ambiguous.forEach(a => {
-            csv += `"Ambiguous","${a.emp}","${a.date}","${a.dayType}","-"\n`;
-        });
-        
-        Object.keys(exceptions.late).forEach(emp => {
-            Object.keys(exceptions.late[emp]).forEach(date => {
-                csv += `"Late","${emp}","${date}","${getDayType(date)}",${exceptions.late[emp][date]}\n`;
-            });
-        });
-        
-        Object.keys(exceptions.early).forEach(emp => {
-            Object.keys(exceptions.early[emp]).forEach(date => {
-                csv += `"Early","${emp}","${date}","${getDayType(date)}",${exceptions.early[emp][date]}\n`;
-            });
-        });
-        
-        Object.keys(exceptions.overtime).forEach(emp => {
-            Object.keys(exceptions.overtime[emp]).forEach(date => {
-                csv += `"Overtime","${emp}","${date}","${getDayType(date)}",${exceptions.overtime[emp][date]}\n`;
-            });
-        });
-        
-        Object.keys(exceptions.encashment).forEach(emp => {
-            csv += `"Encashment","${emp}","-","-",${exceptions.encashment[emp]}\n`;
-        });
-        
-        return csv;
-    }
-    
-    // Override switchTab to include permission check
+    // Override switchTab to include admin check
+    let originalSwitchTab = window.switchTab;
     window.switchTab = function(id) {
-        const moduleMap = {
-            'settings': 'regulation',
-            'attendance': 'attendance_log',
-            'exceptions': 'attendance_exceptions',
-            'salary': 'payroll',
-            'executive': 'executive_dashboard',
-            'admin': 'user_administration',
-            'audit': 'audit_trail',
-            'reports': 'reports'
-        };
-        
-        const module = moduleMap[id];
-        if (module && !hasPermission(module, 'view')) {
-            alert('Access denied. You do not have permission to view this module.');
+        if(id === 'admin' && (!currentUser || currentUser.role !== 'Admin')) {
+            alert('Access denied. Admin only.');
             return;
         }
-        
-        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-        document.querySelectorAll('.tab-modern').forEach(t => t.classList.remove('active'));
-        document.getElementById(id).classList.add('active');
-        if(window.event && window.event.target) window.event.target.classList.add('active');
-        
-        if(id === 'executive' && typeof applyExecutiveFilters === 'function') applyExecutiveFilters();
-        if(id === 'admin' && currentUser && hasPermission('user_administration', 'view')) loadUsers();
+        if(id === 'admin') loadUsers();
         if(id === 'audit') filterAudit();
+        if(originalSwitchTab) originalSwitchTab(id);
     };
     
     // Initialize
     loadUserData();
     checkRememberMe();
     
+    // Add user menu click
     document.querySelector('.user-avatar')?.addEventListener('click', showProfile);
+    
+    // Override existing functions to add audit
+    let originalSaveAllExceptions = window.saveAllExceptions;
+    window.saveAllExceptions = function() {
+        if(originalSaveAllExceptions) originalSaveAllExceptions();
+        if(currentUser) addAuditLog(currentUser.username, 'Data Edit', 'Modified exception data');
+    };
+    
+    let originalApplySettings = window.applySettings;
+    window.applySettings = function() {
+        if(originalApplySettings) originalApplySettings();
+        if(currentUser) addAuditLog(currentUser.username, 'Settings Update', 'Updated corporate policies');
+    };
 </script>
 
 <!-- Override to keep original functions -->
@@ -1803,21 +1105,6 @@
     const getDayType = (date) => { if(isSunday(date)) return 'Sunday'; return isSaturday(date) ? 'Saturday' : 'Weekday'; };
 
     function loadAllData(){
-        if (!hasPermission('attendance_log', 'add')) {
-            showMessage('Access denied. You do not have permission to process data.', 'warning');
-            return;
-        }
-        
-        if (!requireSecurityVerification('attendance_log', 'add', 'Process and import attendance data', () => {
-            loadAllDataInternal();
-        })) {
-            return;
-        }
-        
-        loadAllDataInternal();
-    }
-    
-    function loadAllDataInternal() {
         let btn = document.getElementById('processDataBtn');
         btn.disabled = true;
         btn.innerHTML = '<span class="loader"></span> Processing...';
@@ -1841,11 +1128,8 @@
                                 }
                             });
                             processAllData(); showMessage(`Loaded ${attendanceData.length} records, ${Object.keys(salaryData).length} employees`, 'success'); btn.disabled = false; btn.innerHTML = '<i class="fas fa-play"></i> Process Data';
-                            addAuditLog(currentUser?.username || 'System', 'Data Import', `Imported ${attendanceData.length} attendance records`);
                         }; wdReader.readAsText(wdFile);
-                    } else { processAllData(); showMessage(`Loaded ${attendanceData.length} records, ${Object.keys(salaryData).length} employees`, 'success'); btn.disabled = false; btn.innerHTML = '<i class="fas fa-play"></i> Process Data';
-                        addAuditLog(currentUser?.username || 'System', 'Data Import', `Imported ${attendanceData.length} attendance records`);
-                    }
+                    } else { processAllData(); showMessage(`Loaded ${attendanceData.length} records, ${Object.keys(salaryData).length} employees`, 'success'); btn.disabled = false; btn.innerHTML = '<i class="fas fa-play"></i> Process Data'; }
                 }; salReader.readAsText(salFile);
             }; attReader.readAsText(attFile);
         }, 100);
@@ -2126,112 +1410,12 @@
         deductionChart = new Chart(ctx3, { type: 'pie', data: { labels: ['Late Deduction', 'Early Deduction', 'Absent Deduction'], datasets: [{ data: [totalLateDed, totalEarlyDed, totalAbsentDed], backgroundColor: ['#E74C3C', '#F39C12', '#95A5A6'] }] }, options: { responsive: true, plugins: { legend: { position: 'bottom' } } } });
     }
     
-    window.markPresent=(e,d)=>{ 
-        if (!hasPermission('attendance_exceptions', 'edit')) { alert('Access denied.'); return; }
-        if (!requireSecurityVerification('attendance_exceptions', 'edit', `Mark ${e} present on ${d}`, () => {
-            if(processedData[e]&&processedData[e][d] && !isSunday(d)){ 
-                processedData[e][d].status='Present'; 
-                processedData[e][d].worked=processedData[e][d].required; 
-                processedData[e][d].late=0; 
-                processedData[e][d].early=0; 
-                exceptions.absent=exceptions.absent.filter(a=>!(a.emp===e&&a.date===d)); 
-                renderAttendance(); renderExceptions(); calculateSalaries(); updateGlobalStats(); updateAllCharts(); updateExecutiveDashboard(); 
-                showMessage(`${e} marked present`,'success'); 
-                addAuditLog(currentUser.username, 'Exception Update', `Marked ${e} present on ${d}`);
-            }
-        })) { return; }
-        
-        if(processedData[e]&&processedData[e][d] && !isSunday(d)){ 
-            processedData[e][d].status='Present'; 
-            processedData[e][d].worked=processedData[e][d].required; 
-            processedData[e][d].late=0; 
-            processedData[e][d].early=0; 
-            exceptions.absent=exceptions.absent.filter(a=>!(a.emp===e&&a.date===d)); 
-            renderAttendance(); renderExceptions(); calculateSalaries(); updateGlobalStats(); updateAllCharts(); updateExecutiveDashboard(); 
-            showMessage(`${e} marked present`,'success'); 
-            addAuditLog(currentUser.username, 'Exception Update', `Marked ${e} present on ${d}`);
-        }
-    };
-    
-    window.resolveAmbiguous=(e,d,act)=>{ 
-        if (!hasPermission('attendance_exceptions', 'edit')) { alert('Access denied.'); return; }
-        if (!requireSecurityVerification('attendance_exceptions', 'edit', `Resolve ambiguous for ${e} on ${d}`, () => {
-            if(processedData[e]&&processedData[e][d]){ 
-                processedData[e][d].status=act==='present'?'Present':'Absent'; 
-                processedData[e][d].worked=act==='present'?processedData[e][d].required:0; 
-                processedData[e][d].late=0; 
-                processedData[e][d].early=0; 
-                processedData[e][d].overtime=0; 
-                exceptions.ambiguous=exceptions.ambiguous.filter(a=>!(a.emp===e&&a.date===d)); 
-                if(act==='absent') exceptions.absent.push({emp:e,date:d,dayType:getDayType(d)}); 
-                renderAttendance(); renderExceptions(); calculateSalaries(); updateAllCharts(); updateExecutiveDashboard(); 
-                showMessage(`Resolved ${e}`,'success'); 
-                addAuditLog(currentUser.username, 'Exception Update', `Resolved ambiguous for ${e} on ${d} as ${act}`);
-            }
-        })) { return; }
-        
-        if(processedData[e]&&processedData[e][d]){ 
-            processedData[e][d].status=act==='present'?'Present':'Absent'; 
-            processedData[e][d].worked=act==='present'?processedData[e][d].required:0; 
-            processedData[e][d].late=0; 
-            processedData[e][d].early=0; 
-            processedData[e][d].overtime=0; 
-            exceptions.ambiguous=exceptions.ambiguous.filter(a=>!(a.emp===e&&a.date===d)); 
-            if(act==='absent') exceptions.absent.push({emp:e,date:d,dayType:getDayType(d)}); 
-            renderAttendance(); renderExceptions(); calculateSalaries(); updateAllCharts(); updateExecutiveDashboard(); 
-            showMessage(`Resolved ${e}`,'success'); 
-            addAuditLog(currentUser.username, 'Exception Update', `Resolved ambiguous for ${e} on ${d} as ${act}`);
-        }
-    };
-    
-    window.updateLateValue=(e,d)=>{ 
-        if (!hasPermission('attendance_exceptions', 'edit')) { alert('Access denied.'); return; }
-        let val=parseInt(document.getElementById(`late_${e}_${d}`)?.value)||0; 
-        if(processedData[e]&&processedData[e][d]){ 
-            processedData[e][d].late=val; 
-            if(!exceptions.late[e])exceptions.late[e]={}; 
-            exceptions.late[e][d]=val; 
-            renderAttendance(); calculateSalaries(); updateGlobalStats(); updateAllCharts(); updateExecutiveDashboard(); 
-            showMessage(`Late updated`,'success'); 
-            addAuditLog(currentUser.username, 'Exception Update', `Updated late value for ${e} on ${d}`);
-        }
-    };
-    
-    window.updateEarlyValue=(e,d)=>{ 
-        if (!hasPermission('attendance_exceptions', 'edit')) { alert('Access denied.'); return; }
-        let val=parseInt(document.getElementById(`early_${e}_${d}`)?.value)||0; 
-        if(processedData[e]&&processedData[e][d]){ 
-            processedData[e][d].early=val; 
-            if(!exceptions.early[e])exceptions.early[e]={}; 
-            exceptions.early[e][d]=val; 
-            renderAttendance(); calculateSalaries(); updateGlobalStats(); updateAllCharts(); updateExecutiveDashboard(); 
-            showMessage(`Early updated`,'success'); 
-            addAuditLog(currentUser.username, 'Exception Update', `Updated early value for ${e} on ${d}`);
-        }
-    };
-    
-    window.updateOvertimeValue=(e,d)=>{ 
-        if (!hasPermission('attendance_exceptions', 'edit')) { alert('Access denied.'); return; }
-        let val=parseInt(document.getElementById(`ot_${e}_${d}`)?.value)||0; 
-        let paySel=document.getElementById(`ot_pay_${e}_${d}`)?.value==='yes'?val:0; 
-        if(processedData[e]&&processedData[e][d]){ 
-            processedData[e][d].overtime=paySel; 
-            if(!exceptions.overtime[e])exceptions.overtime[e]={}; 
-            exceptions.overtime[e][d]=paySel; 
-            renderAttendance(); calculateSalaries(); updateAllCharts(); updateExecutiveDashboard(); 
-            showMessage(`OT updated`,'success'); 
-            addAuditLog(currentUser.username, 'Exception Update', `Updated overtime for ${e} on ${d}`);
-        }
-    };
-    
-    window.updateEncashmentValue=(e)=>{ 
-        if (!hasPermission('attendance_exceptions', 'edit')) { alert('Access denied.'); return; }
-        let amt=parseFloat(document.getElementById(`encash_${e}`)?.value)||0; 
-        exceptions.encashment[e]=amt; 
-        calculateSalaries(); updateAllCharts(); updateExecutiveDashboard(); 
-        showMessage(`Encashment updated`,'success'); 
-        addAuditLog(currentUser.username, 'Exception Update', `Updated encashment for ${e}`);
-    };
+    window.markPresent=(e,d)=>{ if(processedData[e]&&processedData[e][d] && !isSunday(d)){ processedData[e][d].status='Present'; processedData[e][d].worked=processedData[e][d].required; processedData[e][d].late=0; processedData[e][d].early=0; exceptions.absent=exceptions.absent.filter(a=>!(a.emp===e&&a.date===d)); renderAttendance(); renderExceptions(); calculateSalaries(); updateGlobalStats(); updateAllCharts(); updateExecutiveDashboard(); showMessage(`${e} marked present`,'success');}};
+    window.resolveAmbiguous=(e,d,act)=>{ if(processedData[e]&&processedData[e][d]){ processedData[e][d].status=act==='present'?'Present':'Absent'; processedData[e][d].worked=act==='present'?processedData[e][d].required:0; processedData[e][d].late=0; processedData[e][d].early=0; processedData[e][d].overtime=0; exceptions.ambiguous=exceptions.ambiguous.filter(a=>!(a.emp===e&&a.date===d)); if(act==='absent') exceptions.absent.push({emp:e,date:d,dayType:getDayType(d)}); renderAttendance(); renderExceptions(); calculateSalaries(); updateAllCharts(); updateExecutiveDashboard(); showMessage(`Resolved ${e}`,'success');}};
+    window.updateLateValue=(e,d)=>{ let val=parseInt(document.getElementById(`late_${e}_${d}`)?.value)||0; if(processedData[e]&&processedData[e][d]){ processedData[e][d].late=val; if(!exceptions.late[e])exceptions.late[e]={}; exceptions.late[e][d]=val; renderAttendance(); calculateSalaries(); updateGlobalStats(); updateAllCharts(); updateExecutiveDashboard(); showMessage(`Late updated`,'success');}};
+    window.updateEarlyValue=(e,d)=>{ let val=parseInt(document.getElementById(`early_${e}_${d}`)?.value)||0; if(processedData[e]&&processedData[e][d]){ processedData[e][d].early=val; if(!exceptions.early[e])exceptions.early[e]={}; exceptions.early[e][d]=val; renderAttendance(); calculateSalaries(); updateGlobalStats(); updateAllCharts(); updateExecutiveDashboard(); showMessage(`Early updated`,'success');}};
+    window.updateOvertimeValue=(e,d)=>{ let val=parseInt(document.getElementById(`ot_${e}_${d}`)?.value)||0; let paySel=document.getElementById(`ot_pay_${e}_${d}`)?.value==='yes'?val:0; if(processedData[e]&&processedData[e][d]){ processedData[e][d].overtime=paySel; if(!exceptions.overtime[e])exceptions.overtime[e]={}; exceptions.overtime[e][d]=paySel; renderAttendance(); calculateSalaries(); updateAllCharts(); updateExecutiveDashboard(); showMessage(`OT updated`,'success');}};
+    window.updateEncashmentValue=(e)=>{ let amt=parseFloat(document.getElementById(`encash_${e}`)?.value)||0; exceptions.encashment[e]=amt; calculateSalaries(); updateAllCharts(); updateExecutiveDashboard(); showMessage(`Encashment updated`,'success');};
     
     function saveAllExceptions(){ 
         Object.keys(exceptions.late).forEach(emp=>{Object.keys(exceptions.late[emp]).forEach(date=>{let inp=document.getElementById(`late_${emp}_${date}`); if(inp){ let val=parseInt(inp.value)||0; processedData[emp][date].late=val; exceptions.late[emp][date]=val; }});});
@@ -2244,7 +1428,6 @@
     function updateAllExceptions(){ saveAllExceptions(); showMessage('All exceptions updated and recalculated','success'); }
     
     function applyAndRecalculate(){ 
-        if (!hasPermission('regulation', 'edit')) { alert('Access denied.'); return; }
         applySettings(); 
         if(attendanceData.length > 0 && Object.keys(salaryData).length > 0) processAllData(); 
         showMessage('Settings applied and all data recalculated','success');
@@ -2278,7 +1461,16 @@
         a.download=`payroll_${new Date().toISOString().slice(0,10)}.xls`; 
         a.click(); 
         showMessage('Exported','success');
-        addAuditLog(currentUser.username, 'Export', 'Exported payroll data');
+    }
+    
+    function switchTab(id){ 
+        document.querySelectorAll('.tab-content').forEach(c=>c.classList.remove('active')); 
+        document.querySelectorAll('.tab-modern').forEach(t=>t.classList.remove('active')); 
+        document.getElementById(id).classList.add('active'); 
+        if(event && event.target) event.target.classList.add('active');
+        if(id === 'executive') applyExecutiveFilters();
+        if(id === 'admin' && currentUser && currentUser.role === 'Admin') loadUsers();
+        if(id === 'audit') filterAudit();
     }
     
     function switchExceptionTab(tab){ 
